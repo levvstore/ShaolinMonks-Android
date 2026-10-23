@@ -44,18 +44,19 @@ void FrameSkip(X86Context&, uint8_t*) {
     constexpr auto kStep = std::chrono::microseconds(16667);
     // a load, a pause in the background or a stall: no catching up on it
     constexpr auto kMaxLag = std::chrono::milliseconds(250);
-    constexpr int kMaxSkips = 3;  // a frame drawn at least every fourth, the controls answer at 15 fps
+    // the most frames stepped without drawing is the frame skip setting: at 3 a frame is drawn at least every
+    // fourth, the controls answer at 15 fps
     static clock::time_point due;
     static int skips = 0;
     auto now = clock::now();
-    if (!game::Opt().frame_skip) {
+    if (game::Opt().frame_skip == 0) {
         due = now;  // turned on again, it starts from here
         skips = 0;
         return;
     }
     // ahead of the clock carries no credit: the pacing at the present keeps 60
     if (due > now || now - due > kMaxLag) due = now;
-    if (now - due >= kStep && skips < kMaxSkips) kernel::W32(kSkipDraw, 1);
+    if (now - due >= kStep && skips < int(game::Opt().frame_skip)) kernel::W32(kSkipDraw, 1);
     skips = kernel::R32(kSkipDraw) ? skips + 1 : 0;
     due += kStep;
 }

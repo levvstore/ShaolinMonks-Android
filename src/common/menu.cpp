@@ -113,7 +113,7 @@ const char* const kLanguageNames[] = {"ENGLISH", "FRENCH", "GERMAN", "ITALIAN", 
 constexpr const char* kDonateUrl = "https://sociabuzz.com/racas/tribe";
 constexpr const char* kGithubUrl = "https://github.com/RanggaCasper";
 constexpr const char* kYoutubeUrl = "https://youtube.com/c/@RanggaCasper";
-constexpr uint32_t kFpsCaps[] = {30, 60, 75, 90, 120, 144, 165, 240, 360, kFpsCapRefresh, 0};
+constexpr uint32_t kFpsCaps[] = {60};  // ninecode: the frame rate is locked to 60
 
 int StepIndex(int index, int step, int count) {
     if (count <= 0) return 0;
@@ -367,7 +367,6 @@ bool* ToggleFlag(Settings& s, int id) {
     switch (id) {
         case kVsync: return &s.vsync;
         case kFpsCounter: return &o.fps_counter;
-        case kFrameSkip: return &o.frame_skip;
         case kUltrawide: return &o.ultrawide;
         case kFpsTemps: return &o.fps_temps;
         case kFpsUsage: return &o.fps_usage;
@@ -467,6 +466,12 @@ bool StepGraphicsRow(int id, int step, Settings& s, char (&text)[64]) {
             return true;
         case kFpsPosition:
             std::snprintf(text, sizeof(text), "%s", kFpsPositionNames[StepTable(kFpsPositions, o.fps_position, step)]);
+            return true;
+        case kFrameSkip:
+            // off, then the most frames in a row the game may step without drawing, up to 3
+            if (step) o.frame_skip = uint32_t(StepRange(int(o.frame_skip), 0, 3, 1, step));
+            if (o.frame_skip == 0) std::snprintf(text, sizeof(text), "OFF");
+            else std::snprintf(text, sizeof(text), "%uX", o.frame_skip);
             return true;
         case kDrawDistance:
             std::snprintf(text, sizeof(text), "%s", kDistanceNames[StepTable(kDistances, o.draw_distance, step)]);

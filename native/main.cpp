@@ -148,8 +148,9 @@ toml::table Table() {
     return t;
 }
 
-// a phone renders the console's frame at about 720p unless the settings say otherwise
-constexpr uint32_t kFirstRunRenderPercent = 67;
+// a phone renders the console's frame at half the screen's height unless the settings say otherwise (ninecode:
+// lowered from 67 for low-end phones)
+constexpr uint32_t kFirstRunRenderPercent = 50;
 
 // Shaolin Monks steps its menus, their key repeat and its films once a frame: they run as on the console at 60
 void PhoneFrameDefaults(Settings& s) {
@@ -187,6 +188,7 @@ void Load() {
     s.height = t["height"].value_or(s.height);
     s.render_percent = t["render_percent"].value_or(s.render_percent);
     s.fps_cap = t["fps_cap"].value_or(s.fps_cap);
+    s.fps_cap = 60;  // ninecode: the frame rate is locked to 60, the settings file cannot raise it
     s.vsync = t["vsync"].value_or(s.vsync);
     s.aniso = t["anisotropic_filtering"].value_or(s.aniso);
     s.join_ip = t["join_ip"].value_or(s.join_ip);

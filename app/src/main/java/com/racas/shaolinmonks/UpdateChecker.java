@@ -46,6 +46,8 @@ final class UpdateChecker {
 
     // manual: asked from the menu, a skipped release counts too; the listener runs on the main thread
     static void check(Context context, boolean manual, Listener listener) {
+        // ninecode: update checks are disabled in this build; it never asks GitHub for a newer release
+        if (true) return;
         if (REPO.isEmpty()) return;
         Context app = context.getApplicationContext();
         SharedPreferences prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
